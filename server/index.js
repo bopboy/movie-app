@@ -33,8 +33,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/', (req, res) => { res.status(200).send('node server working...') })
+app.get('/', (req, res) => { res.status(200).send('node server working...') })
 app.use('/api/users', require('./routes/users'));
+app.use('/api/favorite', require('./routes/favorite'));
 
 
 //use this to show the image you have in node js server to client (react js)
