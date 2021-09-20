@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { API_KEY, API_URL, IMAGE_BASE_URL } from '../../Config'
+import GridCard from '../commons/GridCard'
 import MainImage from '../LandingPage/Sections/MainImage'
 import MovieInfo from './Sections/MovieInfo'
+import { Row } from 'antd'
 
 function MovieDetail(props) {
     let movieId = props.match.params.movieId
     const [Movie, setMovie] = useState([])
+    const [Casts, setCasts] = useState([])
+    const [ActorToggle, setActorToggle] = useState(false)
     useEffect(() => {
         const endpointInfo = `${API_URL}movie/${movieId}?api_key=${API_KEY}`
         fetch(endpointInfo).then(res => res.json()).then(res => {
-            console.log(res)
+            // console.log(res)
             setMovie(res)
         })
+        const endpointCast = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`
+        fetch(endpointCast).then(res => res.json()).then(res => {
+            // console.log(res)
+            setCasts(res.cast)
+        })
     }, [])
+    const toggleActorView = () => { setActorToggle(!ActorToggle) }
     return (
         <div>
             <MainImage
@@ -24,8 +34,20 @@ function MovieDetail(props) {
                 <MovieInfo movie={Movie} />
                 <br />
                 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem' }}>
-                    <button>Toggle Actor View</button>
+                    <button onClick={toggleActorView}>Toggle Actor View</button>
                 </div>
+                {ActorToggle &&
+                    <Row gutter={[16, 16]}>
+                        {Casts && Casts.map((cast, index) => (
+                            <React.Fragment key={index}>
+                                <GridCard
+                                    image={cast.profile_path ? `${IMAGE_BASE_URL}w500${cast.profile_path}` : null}
+                                    characterName={cast.name}
+                                />
+                            </React.Fragment>
+                        ))}
+                    </Row>
+                }
             </div>
         </div>
     )
